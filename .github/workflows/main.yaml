@@ -18,14 +18,13 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H scuzzyfox.com >> ~/.ssh/known_hosts
       - name: Sync the remote repo and build app
-        run: ssh ubuntu@scuzzyfox.com
-        run: cd ~/git-repos/scuzzy-site-api
-        run: git pull origin main
-        run: source env/bin/activate
-        run: pip install -r requirements.txt
-        run: export DJANGO_SETTINGS_MODULE=siteapi.settings_prod
-        run: cd siteapi
-        run: python3 manage.py makemigrations
-        run: python3 manage.py migrate
-        run: python3 manage.py collectstatic -y
-        run: python3 -m gunicorn siteapi.asgi:application -k uvicorn.workers.UvicornWorker --daemon
+        run: |
+          ssh ubuntu@scuzzyfox.com
+          cd ~/git-repos/scuzzy-site-api
+          git pull origin main
+          source env/bin/activate
+          pip install -r requirements.txt
+          export DJANGO_SETTINGS_MODULE=siteapi.settings_prod
+          cd siteapi
+          python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic
+          python3 -m gunicorn siteapi.asgi:application -k uvicorn.workers.UvicornWorker --daemon
