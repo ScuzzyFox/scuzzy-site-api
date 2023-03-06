@@ -61,7 +61,7 @@ class ResetPassword(APIView):
 class GetTest(APIView):
 
     def get(self, request):
-        return Response({"Authentication": "was successful!", "good_job": True})
+        return Response({"Authentication": "was successful!"})
 
 
 class DeleteUser(APIView):
