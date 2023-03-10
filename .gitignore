@@ -118,4 +118,3 @@ db.sqlite3
 settings_debug.py
 settings_prod.py
 env
-**/migrations/

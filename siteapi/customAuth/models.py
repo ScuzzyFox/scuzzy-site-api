@@ -4,17 +4,23 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 import jwt
+from rest_framework.authtoken.models import Token
+import binascii
+import os
+from django.utils.translation import gettext_lazy as _
+
 
 # Create your models here.
 
 
 class ScuzzyFoxContentManagerUserManager(BaseUserManager):
-    def create_user(self, username, password=None, **extra_fields):
+    def create_user(self, username, password=None, email=None, jwt_auth_token=None, **extra_fields):
         username = username.lower()
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         user = self.model(username=username, **extra_fields)
         user.set_password(password)
+        user.email = email
         user.save(using=self._db)
         return user
 
@@ -61,6 +67,35 @@ class CustomJWTToken(models.Model):
 
         self.key = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         super(CustomJWTToken, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.key
+
+
+class TemporaryToken(models.Model):
+    user = models.ForeignKey(
+        ScuzzyFoxContentManagerUser, on_delete=models.CASCADE)
+    key = models.CharField(_("Key"), max_length=40, primary_key=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Work around for a bug in Django:
+        # https://code.djangoproject.com/ticket/19422
+        #
+        # Also see corresponding ticket:
+        # https://github.com/encode/django-rest-framework/issues/705
+        abstract = 'rest_framework.authtoken' not in settings.INSTALLED_APPS
+        verbose_name = _("Token")
+        verbose_name_plural = _("Tokens")
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    @classmethod
+    def generate_key(cls):
+        return binascii.hexlify(os.urandom(20)).decode()
 
     def __str__(self):
         return self.key

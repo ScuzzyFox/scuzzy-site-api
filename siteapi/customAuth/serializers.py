@@ -58,3 +58,22 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("Current password is incorrect.")
 
         return data
+
+
+class RegistrationSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
+
+    def validate(self, data):
+        if len(self.username) > 15:
+            raise serializers.ValidationError("username is too long")
+        if len(self.password < 8):
+            raise serializers.ValidationError("password is too short")
+
+        return data
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=15, required=True)
+    password = serializers.CharField(required=True)
