@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 import jwt
-from rest_framework.authtoken.models import Token
 import binascii
 import os
 from django.utils.translation import gettext_lazy as _
@@ -22,7 +21,7 @@ class ScuzzyFoxContentManagerUserManager(BaseUserManager):
         user.set_password(password)
         user.email = email
         user.save(using=self._db)
-        CustomJWTToken.objects.create(user=user)
+        user.jwt_auth_token = CustomJWTToken.objects.create(user=user)
         return user
 
 
