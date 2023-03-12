@@ -1,7 +1,23 @@
-from .models import ScuzzyFoxContentManagerUser, CustomJWTToken
+from .models import ScuzzyFoxContentManagerUser, CustomJWTToken, TemporaryToken
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
+
+
+class TemporaryTokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+
+    class Meta:
+        model = TemporaryToken
+        fields = ('user_id', 'username', 'created')
+
+
+class JWTTokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+
+    class Meta:
+        model = CustomJWTToken
+        fields = ('user_id', 'username')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -66,9 +82,10 @@ class RegistrationSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
     def validate(self, data):
-        if len(self.username) > 15:
+
+        if int(len(data["username"])) > 15:
             raise serializers.ValidationError("username is too long")
-        if len(self.password < 8):
+        if int(len(data["password"]) < 8):
             raise serializers.ValidationError("password is too short")
 
         return data

@@ -1,4 +1,4 @@
-from .views import Register, Login, ResetPassword, GetTest, DeleteUser, ListUsers
+from .views import Register, Login, ResetPassword, GetTest, DeleteUser, ListUsers, ListTempTokens, ListJWTTokens
 from django.urls import path
 
 urlpatterns = [
@@ -8,4 +8,6 @@ urlpatterns = [
     path("get/", GetTest.as_view(), name="get"),
     path("delete-user/", DeleteUser.as_view(), name="delete-user"),
     path("users/", ListUsers.as_view(), name="list-users"),
+    path("temp-tokens/", ListTempTokens.as_view(), name="temp-tokens"),
+    path("jwt-tokens/", ListJWTTokens.as_view(), name="jwt-tokens"),
 ]

@@ -22,6 +22,7 @@ class ScuzzyFoxContentManagerUserManager(BaseUserManager):
         user.set_password(password)
         user.email = email
         user.save(using=self._db)
+        CustomJWTToken.objects.create(user=user)
         return user
 
 

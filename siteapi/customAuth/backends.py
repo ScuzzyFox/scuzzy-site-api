@@ -25,7 +25,7 @@ class UsernameBackend(ModelBackend):
 
 class JWTAuthentication(TokenAuthentication):
     model = CustomJWTToken
-    keyword = 'Token'
+    keyword = 'JWT'
 
     def authenticate_credentials(self, key):
         # token = DB token, key = user-supplied token (lock and key)
@@ -109,7 +109,8 @@ class TemporaryTokenAuthentication(TokenAuthentication):
 
         time_since_creation = timezone.now() - token.created
         if time_since_creation > timedelta(hours=1):
+            token.delete()
             raise exceptions.AuthenticationFailed(
-                'Your temporary authentication token has expired.')
+                'Your temporary authentication token has expired and will now be deleted.')
 
         return (token.user, token)

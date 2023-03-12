@@ -1,28 +1,43 @@
 from django.shortcuts import render
 from rest_framework import generics
-from .serializers import UserSerializer, ChangePasswordSerializer, ListUserSerializer, RegistrationSerializer, LoginSerializer
+from .serializers import UserSerializer, ChangePasswordSerializer, ListUserSerializer, RegistrationSerializer, LoginSerializer, TemporaryTokenSerializer, JWTTokenSerializer
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomJWTToken, ScuzzyFoxContentManagerUser, TemporaryToken
 from .backends import TemporaryTokenAuthentication, JWTAuthentication
-from django import forms
 
 # Create your views here.
 
 
+class ListTempTokens(generics.ListAPIView):
+    permission_classes = ()
+    serializer_class = TemporaryTokenSerializer
+    queryset = TemporaryToken.objects.all()
+
+
+class ListJWTTokens(generics.ListAPIView):
+    permission_classes = ()
+    serializer_class = JWTTokenSerializer
+    queryset = CustomJWTToken.objects.all()
+
+
 class Register(APIView):
     # someone needs to have been given a token for you to register
-    authentication_classes = [TemporaryTokenAuthentication]
+    authentication_classes = [TemporaryTokenAuthentication, JWTAuthentication]
     serializer_class = RegistrationSerializer
+
+    def get(self, request):
+        token = TemporaryToken.objects.create(user=request.user)
+        return Response({"Token": token.key})
 
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
             user = ScuzzyFoxContentManagerUser.objects.create_user(
-                username=data.username, email=data.email, password=data.password)
+                username=data["username"], email=data["email"], password=data["password"])
             CustomJWTToken.objects.create(user=user)
             return Response(UserSerializer(user).data)
         else:
@@ -53,6 +68,7 @@ class Login(APIView):
 
 
 class ResetPassword(APIView):
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request):
         user = request.user
@@ -67,24 +83,32 @@ class ResetPassword(APIView):
 
             user_serializer = UserSerializer(user)
             returnData = dict(user_serializer.data)
-            returnData["Token"] = user.jwt_auth_token.key
             return Response(returnData)
         else:
             return Response({"error": "could not validate new passwords"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GetTest(APIView):
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request):
         return Response({"Authentication": "was successful!"})
 
 
 class DeleteUser(APIView):
+    authentication_classes = [JWTAuthentication]
 
     def delete(self, request):
         user = request.user
         user_serializer = UserSerializer(user)
-        ScuzzyFoxContentManagerUser.objects.get(id=user.id).delete()
+
+        confirmedUser = authenticate(
+            username=user.username, password=request.data["password"])
+
+        if confirmedUser is not None:
+            confirmedUser.delete()
+
+        # ScuzzyFoxContentManagerUser.objects.get(id=user.id).delete()
 
         return Response(user_serializer.data, status=status.HTTP_200_OK)
 
@@ -98,10 +122,10 @@ class ListUsers(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class GenerateTempToken(APIView):
+""" class GenerateTempToken(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get(self, request):
         user = request.user
         token = TemporaryToken.objects.create(user=user)
-        return Response({"Token: ": token.key}, status=status.HTTP_200_OK)
+        return Response({"Token: ": token.key}, status=status.HTTP_200_OK) """
