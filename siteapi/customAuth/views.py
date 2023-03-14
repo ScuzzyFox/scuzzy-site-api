@@ -45,7 +45,7 @@ class Register(APIView):
         """
         # requestData = dict(request.data)
         # usernames are all lowercase
-        request.data["username"] = str(request.data["username"]).lower()
+        # request.data["username"] = str(request.data["username"]).lower()
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
