@@ -20,10 +20,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'customAuth',
     'goals',
+    'corsheaders',
 
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -113,3 +116,4 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH_USER_MODEL = 'customAuth.ScuzzyFoxContentManagerUser'
+CORS_ALLOW_ALL_ORIGINS = True
