@@ -56,7 +56,7 @@ class Register(APIView):
             # should return the user's data (including token)
             return Response(UserSerializer(user).data)
         else:
-            return Response({"error: invalid data"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "invalid data", "data": requestData}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Login(APIView):
