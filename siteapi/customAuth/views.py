@@ -45,12 +45,12 @@ class Register(APIView):
         """
         requestData = dict(request.data)
         # usernames are all lowercase
-        requestData["username"] = requestData["username"].lower()
+        requestData["username"] = str(requestData["username"]).lower()
         serializer = RegistrationSerializer(data=requestData)
         if serializer.is_valid():
             data = serializer.validated_data
             user = ScuzzyFoxContentManagerUser.objects.create_user(
-                username=data["username"].lower(), email=data["email"], password=data["password"])
+                username=str(data["username"]).lower(), email=data["email"], password=data["password"])
             # CustomJWTToken.objects.create(user=user)
 
             # should return the user's data (including token)
@@ -70,7 +70,7 @@ class Login(APIView):
         Accessible to anyone."""
 
         # all usernames are lowercase
-        username = request.data.get("username").lower()
+        username = str(request.data.get("username")).lower()
 
         password = request.data.get("password")
 
