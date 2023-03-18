@@ -87,6 +87,7 @@ class RegistrationSerializer(serializers.Serializer):
             raise serializers.ValidationError("username is too long")
         if int(len(data["password"]) < 8):
             raise serializers.ValidationError("password is too short")
+
         data["username"] = str(data["username"]).lower()
 
         return data

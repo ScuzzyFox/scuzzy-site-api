@@ -22,6 +22,7 @@ class GoalDetail(generics.RetrieveAPIView):
     queryset = Goal.objects.all()
 
 
+# update/delete a specific goal
 class UDGoals(generics.GenericAPIView, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
     authentication_classes = [JWTAuthentication]
     serializer_class = GoalSerializer

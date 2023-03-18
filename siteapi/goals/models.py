@@ -11,6 +11,18 @@ from django.utils import timezone
 
 
 class Goal(models.Model):
+
+    def get_file_path(instance, filename):
+
+        # extract the extension from the filename
+        ext = filename.split('.')[-1]
+
+        # replace filename with a random uuid +.ext
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+
+        # combine fileame to path
+        return os.path.join('goals/images/', filename)
+
     created = models.DateTimeField(auto_now=True, editable=False)
     cost = models.DecimalField(decimal_places=2, max_digits=6)
     name = models.CharField(max_length=30, unique=True)
@@ -21,14 +33,14 @@ class Goal(models.Model):
     date_fulfilled = models.DateTimeField(blank=True, null=True)
     slug = models.SlugField(db_index=True, unique=True)
     image = models.ImageField(
-        upload_to='goals/images/')
+        upload_to=get_file_path)
     image_alt = models.CharField(max_length=100)
 
     def make_fulfilled(self):
-        self.fulfilled = True
-        if not self.date_fulfilled:
+        if not self.fulfilled:
+            self.fulfilled = True
             self.date_fulfilled = timezone.now()
-        self.save()
+            self.save()
 
 
 @receiver(models.signals.post_delete, sender=Goal)
