@@ -1,8 +1,10 @@
 from django.urls import path
-from .views import ListGoals, GoalDetail, UDGoals, CreateGoal, FulfillGoal
+from .views import ListGoals, GoalDetail, UDGoals, CreateGoal, FulfillGoal, GoalDetailSlug
 
 urlpatterns = [
     path('goals/', ListGoals.as_view(), name='goals'),
+    path('goals/slug/<slug:slug>/',
+         GoalDetailSlug.as_view(), name='goal-detail-slug'),
     path('goals/<int:pk>/', GoalDetail.as_view(), name='goal-detail'),
     path('mod-goals/<int:pk>/fulfill',
          FulfillGoal.as_view(), name='fulfill-goal'),
