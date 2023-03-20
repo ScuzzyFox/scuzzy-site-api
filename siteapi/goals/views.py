@@ -36,7 +36,7 @@ class UDGoals(generics.GenericAPIView, mixins.DestroyModelMixin, mixins.UpdateMo
     queryset = Goal.objects.all()
 
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        return self.partial_update(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
