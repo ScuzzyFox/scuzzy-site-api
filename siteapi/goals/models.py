@@ -23,7 +23,7 @@ class Goal(models.Model):
         # combine fileame to path
         return os.path.join('goals/images/', filename)
 
-    created = models.DateTimeField(auto_now=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
     cost = models.DecimalField(decimal_places=2, max_digits=6)
     name = models.CharField(max_length=30, unique=True)
     description = models.TextField("what is it?")
