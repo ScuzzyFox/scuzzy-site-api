@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'goals',
     'corsheaders',
     'site_status',
+    'commissions',
 
 ]
 
