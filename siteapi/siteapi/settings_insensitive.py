@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'customAuth',
     'goals',
     'corsheaders',
+    'site_status',
 
 ]
 
