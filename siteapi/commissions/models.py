@@ -101,3 +101,4 @@ class CommissionStatus(models.Model):
     color = models.CharField(max_length=100)
 
 # add order and reference models
+# order should have a calculate_subtotal function
