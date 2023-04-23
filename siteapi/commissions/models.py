@@ -56,6 +56,10 @@ class Commission(models.Model):
         self.should_be_featured = not self.should_be_featured
         self.save()
 
+    def toggle_visibility(self):
+        self.visible = not self.visible
+        self.save()
+
     def toggle_availability(self):
         self.available = not self.available
         self.save()
