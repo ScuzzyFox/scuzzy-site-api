@@ -99,3 +99,21 @@ class TemporaryToken(models.Model):
 
     def __str__(self):
         return self.key
+
+
+class PermanentToken(models.Model):
+    user = models.ForeignKey(
+        ScuzzyFoxContentManagerUser, on_delete=models.CASCADE)
+    key = models.CharField(_("Key"), max_length=40, primary_key=True)
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    @classmethod
+    def generate_key(cls):
+        return binascii.hexlify(os.urandom(20)).decode()
+
+    def __str__(self):
+        return self.key

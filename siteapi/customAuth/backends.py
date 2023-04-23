@@ -1,7 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
 from rest_framework.authentication import TokenAuthentication, get_authorization_header
-from .models import CustomJWTToken, TemporaryToken
+from .models import CustomJWTToken, TemporaryToken, PermanentToken
 from rest_framework import HTTP_HEADER_ENCODING, exceptions
 from django.conf import settings
 import jwt
@@ -114,3 +114,8 @@ class TemporaryTokenAuthentication(TokenAuthentication):
                 'Your temporary authentication token has expired and will now be deleted.')
 
         return (token.user, token)
+
+
+class PermanentTokenAuthentication(TokenAuthentication):
+    model = PermanentToken
+    keyword = 'Poken'

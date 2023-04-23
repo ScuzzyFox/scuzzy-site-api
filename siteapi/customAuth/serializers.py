@@ -1,4 +1,4 @@
-from .models import ScuzzyFoxContentManagerUser, CustomJWTToken, TemporaryToken
+from .models import ScuzzyFoxContentManagerUser, CustomJWTToken, TemporaryToken, PermanentToken
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
@@ -96,3 +96,12 @@ class RegistrationSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=15, required=True)
     password = serializers.CharField(required=True)
+
+
+class ListPermanentTokenSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PermanentToken
+        fields = ['key']
+        extra_kwargs = {
+            'key': {'read_only': True, "required": True}}

@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'goals',
     'corsheaders',
     'site_status',
-    'commissions',
+    'telegram',
 
 ]
 
@@ -106,6 +106,7 @@ REST_FRAMEWORK = {
         'customAuth.backends.JWTAuthentication',
         'customAuth.backends.TemporaryTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'customAuth.backends.PermanentTokenAuthentication'
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

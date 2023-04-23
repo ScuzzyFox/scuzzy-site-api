@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from rest_framework import generics
-from .serializers import UserSerializer, ChangePasswordSerializer, ListUserSerializer, RegistrationSerializer, LoginSerializer, TemporaryTokenSerializer, JWTTokenSerializer
+from .serializers import UserSerializer, ChangePasswordSerializer, ListUserSerializer, RegistrationSerializer, LoginSerializer, TemporaryTokenSerializer, JWTTokenSerializer, ListPermanentTokenSerializer
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework import status
-from .models import CustomJWTToken, ScuzzyFoxContentManagerUser, TemporaryToken
+from .models import CustomJWTToken, ScuzzyFoxContentManagerUser, TemporaryToken, PermanentToken
 from .backends import TemporaryTokenAuthentication, JWTAuthentication
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework import permissions
 
 
 # List the temporary tokens that currently exist
@@ -159,3 +160,27 @@ class ListUsers(APIView):
         users = ScuzzyFoxContentManagerUser.objects.all()
         serializer = ListUserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GenerateDeleteOrListPermanentToken(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        user = request.user
+        serializer = ListPermanentTokenSerializer(
+            PermanentToken.objects.filter(user=user), many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        user = request.user
+        token = PermanentToken.objects.create(user=user)
+
+        return Response({"Token": token.key}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        token = request.data.get("token")
+        try:
+            PermanentToken.objects.get(key=token).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except PermanentToken.DoesNotExist:
+            return Response({"error": "Token not found. Typo or already deleted token."}, status=status.HTTP_404_NOT_FOUND)
