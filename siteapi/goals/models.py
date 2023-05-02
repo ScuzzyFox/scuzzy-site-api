@@ -34,6 +34,7 @@ class Goal(models.Model):
     image = models.ImageField(
         upload_to=get_file_path)
     image_alt = models.CharField(max_length=100)
+    priority = models.IntegerField(default=0)
 
     def make_fulfilled(self):
         if not self.fulfilled:
