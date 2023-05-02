@@ -23,5 +23,6 @@ urlpatterns = [
     path('authentication/', include('customAuth.urls')),
     path('', include('goals.urls')),
     path('', include('site_status.urls')),
-    path('', include('telegram.urls'))
+    path('', include('telegram.urls')),
+    path('', include('commissions.urls')),
 ]

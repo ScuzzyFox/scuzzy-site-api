@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'site_status',
     'telegram',
-
+    'commissions',
 ]
 
 MIDDLEWARE = [

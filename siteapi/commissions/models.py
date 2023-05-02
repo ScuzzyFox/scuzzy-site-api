@@ -129,7 +129,6 @@ class CommissionVisual(models.Model):
         self.remove_all_files_not_attached_to_model()
 
     def generate_thumbnails(self):
-        # TODO: Need to ensure new models are made under same group as original
         def generate_sizes(max):
             sizes = []
             i = 256
