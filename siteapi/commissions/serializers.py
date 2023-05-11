@@ -146,6 +146,7 @@ class CommissionSerializer(serializers.ModelSerializer):
             'categories',
             'ad_image',
             'ad_image_url',
+            'base_price',
         ]
         extra_kwargs = {
             "options": {"read_only": True},

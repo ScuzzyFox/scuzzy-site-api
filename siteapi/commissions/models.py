@@ -58,6 +58,7 @@ class Commission(models.Model):
     # should this show as a front page item?
     should_be_featured = models.BooleanField(default=False)
     visible = models.BooleanField(default=True)
+    base_price = models.IntegerField(default=0)
 
     def toggle_featured(self):
         self.should_be_featured = not self.should_be_featured
