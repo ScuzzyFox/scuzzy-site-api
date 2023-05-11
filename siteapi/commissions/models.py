@@ -19,11 +19,11 @@ class CommissionOption(models.Model):
     adult = models.BooleanField(default=False)
     abdl = models.BooleanField(default=False)
     # an order can't contain more than one option with the same exclusive_with property
-    exclusive_with = models.CharField(max_length=100)
+    exclusive_with = models.CharField(max_length=100, blank=True, null=True)
 
     # an order needs 1 or more of each unique required
     required = models.CharField(max_length=100, blank=True, null=True)
-    example_image = models.ImageField(blank=True, null=True)
+    example_image = models.ImageField(blank=True)
 
     def get_other_required(self):
         return CommissionOption.objects.filter(required=self.required)
@@ -34,8 +34,14 @@ class CommissionOption(models.Model):
 
 class Commission(models.Model):
     # done
+    def get_file_path(instance, filename):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        return os.path.join('commissions/ads/', filename)
+
     title = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, db_index=True, unique=True)
+    slug = models.SlugField(max_length=250, db_index=True,
+                            unique=True, blank=True, null=True)
     short_description = models.CharField(max_length=500)
     verbose_description = models.TextField()  # markdown or html?
     adult = models.BooleanField(default=False)
@@ -46,6 +52,7 @@ class Commission(models.Model):
     order_count = models.IntegerField(default=0)
     available = models.BooleanField(default=False)
     ad_blurb = models.TextField()
+    ad_image = models.ImageField(upload_to=get_file_path, blank=True)
     categories = models.ManyToManyField(CommissionCategory)
     options = models.ManyToManyField(CommissionOption)
     # should this show as a front page item?
@@ -68,14 +75,15 @@ class Commission(models.Model):
         self.view_count = self.view_count + 1
         self.save()
 
-    def increment_order_count(self):
-        self.order_count = self.order_count + 1
+    def calculate_order_count(self):
+        self.order_count = CommissionOrder.objects.filter(
+            commission_id=self.id).filter(completed=True).count()
         self.save()
 
 
 class CommissionVisual(models.Model):
     # done
-    def get_uuid(self):
+    def get_uuid():
         return str(uuid.uuid4())
 
     commission = models.ForeignKey(
@@ -87,6 +95,10 @@ class CommissionVisual(models.Model):
     is_video = models.BooleanField(default=False)
     group_identifier = models.CharField(max_length=100, default=get_uuid)
     order = models.IntegerField()
+
+    # default order should be by order ascending:
+    class Meta:
+        ordering = ['order']
 
     def rename_file_with_uuid(self):
         # doesn't matter what file type it is, just rename it with a uuid
@@ -113,13 +125,14 @@ class CommissionVisual(models.Model):
         # brings up a FieldFile object from the model (which is like a file object)
         file = self.visual
         if file.name.endswith('.png') or file.name.endswith('.jpeg') or file.name.endswith('.jpg'):
+            print("----CONVERTING TO WEBP-----")
             # open the file (with makes sure to close the resource after the operation is complete)
             with Image.open(file) as image:
                 # save the file as a webp physically on the disk to the original path (with extension replaced)
                 image.save(file.path.replace('.png', '.webp').replace(
                     '.jpeg', '.webp').replace('.jpg', '.webp'), format='WEBP')
                 # set the new file to the file_field (this part only changes the path represented as text in the database)
-                self.file_field = file.name.replace('.png', '.webp').replace(
+                self.visual = file.name.replace('.png', '.webp').replace(
                     '.jpeg', '.webp').replace('.jpg', '.webp')
                 # save the model
                 self.save()
@@ -141,7 +154,8 @@ class CommissionVisual(models.Model):
         ext = os.path.splitext(file.name)[1]
         # OG_name = os.path.splitext(file)[0]
         if str(ext).lower() in ['.png', '.jpeg', '.jpg', '.webp']:
-            with Image.open(file) as image:
+            print(file.path)
+            with Image.open(file.path) as image:
                 (x, y) = image.size
                 largest = x if x > y else y
                 sizes = generate_sizes(largest)
@@ -158,7 +172,7 @@ class CommissionVisual(models.Model):
                     # set the new file to the file_field (this part only changes the path represented as text in the database)
                     # have to use name here and not path because path is the full path to the file on the disk, and name is just the relative location of the file compared to MEDIA_ROOT
                     new_model = CommissionVisual(
-                        group_identifier=self.group_identifier, visual=file.name.replace(ext, '_'+str(s)+ext), commission=self.commission, adult=self.adult, abdl=self.abdl, is_video=self.is_video, )
+                        group_identifier=self.group_identifier, visual=file.name.replace(ext, '_'+str(s)+ext), commission=self.commission, adult=self.adult, abdl=self.abdl, is_video=self.is_video, order=self.order)
                     # new_model.visual = file.name.replace(ext, '_'+str(s)+ext)
                     # save the model
                     new_model.save()
@@ -256,26 +270,31 @@ class CommissionOrder(models.Model):
     commission_description = models.TextField()
     number_of_characters = models.IntegerField()
     # this is a data url of customer's sketch.
-    customer_sketch = models.TextField()
+    customer_sketch = models.TextField(blank=True, null=True)
     completed = models.BooleanField(default=False)
 
     def calculate_subtotal(self):
         # query all of the commission options belonging to the order.
-        opts = self.selected_options
+        opts = self.selected_options.all() if self.selected_options.all() else None
+        print(opts)
         # sum all of the costs of each commission option.
         sum = 0
-        for opt in opts:
-            sum += opt.cost
+        if opts is not None:
+            for opt in opts:
+                sum += opt.cost
         # assign the sum to the subtotal property
         self.subtotal = sum
         # save the model
         self.save()
 
     def save(self, *args, **kwargs):
-        # calculate the subtotal
-        self.calculate_subtotal()
         # save the model
         super().save(*args, **kwargs)
+        self.commission.calculate_order_count()
+
+    def toggle_completed(self):
+        self.completed = not self.completed
+        self.save()
 
 
 class CharacterReference(models.Model):
@@ -294,6 +313,7 @@ class CharacterReference(models.Model):
     # link OR image allowed, not both.
     link = models.CharField(max_length=500, blank=True, null=True)
     image = models.ImageField(upload_to=get_file_path,  blank=True, null=True)
+    text_description = models.TextField(blank=True, null=True)
     adult = models.BooleanField()
     abdl = models.BooleanField()
 

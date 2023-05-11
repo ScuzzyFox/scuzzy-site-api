@@ -1,12 +1,10 @@
 from django.urls import path, re_path
-from .views import CommissionView, CommissionDetailView, commissionDetailSlugView, CommissionOrderView, CommissionOrderDetailView, CommissionCategoryView, CommissionCategoryDetailView, CommissionOptionDetailView, CommissionOptionView, CommissionStatusView, CommissionVisualView, CharacterReferenceView, CommissionStatusDetailView, CommissionVisualDetailView, CharacterReferenceDetailView, CommissionAddRemoveCategory, OrderAddRemoveStatus, CommissionAddRemoveOption
+from .views import CommissionView, CommissionDetailView, CommissionOrderView, CommissionOrderDetailView, CommissionCategoryView, CommissionCategoryDetailView, CommissionOptionDetailView, CommissionOptionView, CommissionStatusView, CommissionVisualView, CharacterReferenceView, CommissionStatusDetailView, CommissionVisualDetailView, CharacterReferenceDetailView, CommissionAddRemoveCategory, OrderAddRemoveStatus, CommissionAddRemoveOption, OrderAddRemoveOption, CommissionToggleAvailability, CommissionToggleFeatured, CommissionToggleVisibility, CommissionIncrementViewCount, commissionDetailSlugView
 
 urlpatterns = [
     path('commissions/', CommissionView.as_view(), name='commissions'),
     re_path(r'^commissions/(?P<pk>\d+)/$',
             CommissionDetailView.as_view(), name='commissions-detail'),
-    path('commissions/slug/<slug:slug>/',
-         commissionDetailSlugView, name='commissions-detail-slug'),
     path('commissions/option/<int:commission_id>/<int:option_id>/',
          CommissionAddRemoveOption.as_view(), name='commissions-add-remove-option'),
     path('commissions/category/<int:commission_id>/<int:category_id>/',
@@ -37,5 +35,17 @@ urlpatterns = [
          name='commissions-characters'),
     path('commissions/characters/<int:pk>/',
          CharacterReferenceDetailView.as_view(), name='commissions-characters-detail'),
+    path('commissions/orders/option/<int:order_id>/<int:option_id>/',
+         OrderAddRemoveOption.as_view(), name='commissions-order-add-remove-option'),
+    path('commissions/<int:pk>/toggle-availability/',
+         CommissionToggleAvailability.as_view(), name='commissions-toggle-availability'),
+    path('commissions/<int:pk>/toggle-featured/',
+         CommissionToggleFeatured.as_view(), name='commissions-toggle-featured'),
+    path('commissions/<int:pk>/toggle-visibility/',
+         CommissionToggleVisibility.as_view(), name='commissions-toggle-visibility'),
+    path('commissions/<int:pk>/increment-view-count/',
+         CommissionIncrementViewCount.as_view(), name='commissions-increment-view-count'),
+    path('commissions/slug/<slug:slug>/',
+         commissionDetailSlugView.as_view(), name='commissions-slug-detail')
 
 ]
