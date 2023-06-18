@@ -102,25 +102,15 @@ class CommissionAddRemoveOption(APIView):
 
     def post(self, request, commission_id, option_id, *args, **kwargs):
         commission = get_object_or_404(Commission, id=commission_id)
-        initial_count_of_options = len(commission.options)
         option = get_object_or_404(CommissionOption, id=option_id)
         commission.options.add(option)
-        if initial_count_of_options < len(commission.options):
-            return Response(CommissionSerializer(commission, context={'request': request}).data)
-        else:
-            return Response({'error': "commission options did not increase. Failed to add option "+option_id+" to commission "+commission_id})
+        return Response(CommissionSerializer(commission, context={'request': request}).data)
 
     def delete(self, request, commission_id, option_id, *args, **kwargs):
         commission = get_object_or_404(Commission, id=commission_id)
-        initial_count_of_options = len(commission.options)
-
         option = get_object_or_404(CommissionOption, id=option_id)
         commission.options.remove(option)
-        if initial_count_of_options < len(commission.options):
-
-            return Response(CommissionSerializer(commission, context={'request': request}).data)
-        else:
-            return Response({'error': "commission options did not decrease. Failed to remove option "+option_id+" from commission "+commission_id})
+        return Response(CommissionSerializer(commission, context={'request': request}).data)
 
 
 # get all commission options or make a new one
