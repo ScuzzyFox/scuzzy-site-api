@@ -533,14 +533,14 @@ class OrderAddRemoveOption(APIView):
         option = get_object_or_404(CommissionOption, id=option_id)
         order.selected_options.add(option)
         order.calculate_subtotal()
-        return Response(CommissionOrderSerializer(order).data)
+        return Response(CommissionOrderSerializer(order, context={'request': request}).data)
 
     def delete(self, request, order_id, option_id, *args, **kwargs):
         order = get_object_or_404(CommissionOrder, id=order_id)
         option = get_object_or_404(CommissionOption, id=option_id)
         order.selected_options.remove(option)
         order.calculate_subtotal()
-        return Response(CommissionOrderSerializer(order).data)
+        return Response(CommissionOrderSerializer(order, context={'request': request}).data)
 
 
 class CommissionToggleFeatured(generics.GenericAPIView):
