@@ -275,6 +275,7 @@ class CommissionOrder(models.Model):
     completed = models.BooleanField(default=False)
 
     def calculate_subtotal(self):
+        CHARACTER_MODIFIER = 0.45
         # query all of the commission options belonging to the order.
         opts = self.selected_options.all() if self.selected_options.all() else None
         print(opts)
@@ -284,7 +285,9 @@ class CommissionOrder(models.Model):
             for opt in opts:
                 sum += opt.cost
         # assign the sum to the subtotal property
-        self.subtotal = sum
+        self.subtotal = sum + self.commission.base_price + \
+            (self.number_of_characters-1) * CHARACTER_MODIFIER * \
+            (sum + self.commission.base_price)
         # save the model
         self.save()
 
