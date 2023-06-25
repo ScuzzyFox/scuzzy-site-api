@@ -1,3 +1,4 @@
+import decimal
 from django.db import models
 import os
 import uuid
@@ -275,7 +276,7 @@ class CommissionOrder(models.Model):
     completed = models.BooleanField(default=False)
 
     def calculate_subtotal(self):
-        CHARACTER_MODIFIER = 0.45
+        CHARACTER_MODIFIER = decimal.Decimal(0.45)
         # query all of the commission options belonging to the order.
         opts = self.selected_options.all() if self.selected_options.all() else None
         print(opts)
