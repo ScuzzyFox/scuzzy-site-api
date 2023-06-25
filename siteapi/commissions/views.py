@@ -390,6 +390,7 @@ class CommissionOrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin
         serializer.save()
         instance = self.get_object()
         instance.calculate_subtotal()
+        instance.commission.calculate_order_count()
 
     def put(self, request, *args, **kwargs):
         return self.partial_update(request=request, *args, **kwargs)
