@@ -26,6 +26,10 @@ class CommissionOption(models.Model):
     required = models.CharField(max_length=100, blank=True, null=True)
     example_image = models.ImageField(blank=True)
 
+    class Meta:
+        # ascending by name
+        ordering = ['name', 'id']
+
     def get_other_required(self):
         return CommissionOption.objects.filter(required=self.required)
 
