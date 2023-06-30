@@ -330,15 +330,7 @@ class CharacterReference(models.Model):
     adult = models.BooleanField()
     abdl = models.BooleanField()
 
-    # add a constraint to ensure that at least one link or image is provided, but not both.
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(link__isnull=False, image__isnull=False) | models.Q(
-                    link__isnull=True, image__isnull=True),
-                name='link_or_image_required'
-            )
-        ]
+   
 
     def delete(self, *args, **kwargs):
         # delete the image
