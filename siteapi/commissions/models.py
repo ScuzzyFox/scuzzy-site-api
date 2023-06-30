@@ -330,7 +330,8 @@ class CharacterReference(models.Model):
     adult = models.BooleanField()
     abdl = models.BooleanField()
 
-   
+    class Meta:
+        ordering = ['id']
 
     def delete(self, *args, **kwargs):
         # delete the image
