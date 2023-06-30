@@ -279,6 +279,10 @@ class CommissionOrder(models.Model):
     customer_sketch = models.TextField(blank=True, null=True)
     completed = models.BooleanField(default=False)
 
+    class Meta:
+        # descending by date
+        ordering = ['-created']
+
     def calculate_subtotal(self):
         CHARACTER_MODIFIER = decimal.Decimal(0.45)
         # query all of the commission options belonging to the order.
