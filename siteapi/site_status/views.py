@@ -31,15 +31,15 @@ class SiteStatusDetail(APIView):
             site_status.save()
             return site_status
         except SiteStatus.DoesNotExist:
-
-            site_status = SiteStatus(origin=origin)
-            site_status.save()
-            # calculates total website views based on sum of all page views
-            total_web_views = PageView.objects.filter(site_status=site_status).aggregate(
-                sum_views=models.Sum('view_count')).get('sum_views', 0)
-            site_status.website_views = total_web_views if total_web_views is not None else 0
-            site_status.save()
-            return site_status
+            if "scuzzyfox.com" in str(origin)
+                site_status = SiteStatus(origin=origin)
+                site_status.save()
+                # calculates total website views based on sum of all page views
+                total_web_views = PageView.objects.filter(site_status=site_status).aggregate(
+                    sum_views=models.Sum('view_count')).get('sum_views', 0)
+                site_status.website_views = total_web_views if total_web_views is not None else 0
+                site_status.save()
+                return site_status
 
     def get(self, request, origin):
 
@@ -63,8 +63,9 @@ class PageViewDetail(APIView):
         try:
             site_status = SiteStatus.objects.get(origin=origin)
         except SiteStatus.DoesNotExist:
-            site_status = SiteStatus(origin=origin)
-            site_status.save()
+            if "scuzzyfox.com" in str(origin)
+                site_status = SiteStatus(origin=origin)
+                site_status.save()
         try:
             page_view = PageView.objects.get(
                 site_status=site_status, pathname=pathname)
@@ -78,8 +79,9 @@ class PageViewDetail(APIView):
         try:
             site_status = SiteStatus.objects.get(origin=origin)
         except SiteStatus.DoesNotExist:
-            site_status = SiteStatus(origin=origin)
-            site_status.save()
+            if "scuzzyfox.com" in str(origin)
+                site_status = SiteStatus(origin=origin)
+                site_status.save()
         total_web_views = PageView.objects.filter(site_status=site_status).aggregate(
             sum_views=models.Sum('view_count')).get('sum_views', 0)
         site_status.website_views = total_web_views if total_web_views is not None else 0
