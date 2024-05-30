@@ -31,7 +31,7 @@ class SiteStatusDetail(APIView):
             site_status.save()
             return site_status
         except SiteStatus.DoesNotExist:
-            if "scuzzyfox.com" in str(origin)
+            if "scuzzyfox.com" in str(origin):
                 site_status = SiteStatus(origin=origin)
                 site_status.save()
                 # calculates total website views based on sum of all page views
@@ -63,7 +63,7 @@ class PageViewDetail(APIView):
         try:
             site_status = SiteStatus.objects.get(origin=origin)
         except SiteStatus.DoesNotExist:
-            if "scuzzyfox.com" in str(origin)
+            if "scuzzyfox.com" in str(origin):
                 site_status = SiteStatus(origin=origin)
                 site_status.save()
         try:
@@ -79,7 +79,7 @@ class PageViewDetail(APIView):
         try:
             site_status = SiteStatus.objects.get(origin=origin)
         except SiteStatus.DoesNotExist:
-            if "scuzzyfox.com" in str(origin)
+            if "scuzzyfox.com" in str(origin):
                 site_status = SiteStatus(origin=origin)
                 site_status.save()
         total_web_views = PageView.objects.filter(site_status=site_status).aggregate(
