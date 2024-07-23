@@ -235,8 +235,7 @@ class CommissionOrderSerializer(serializers.ModelSerializer):
     statuses = CommissionStatusSerializer(read_only=True,  many=True)
     character_references = CharacterReferenceSerializer(
         read_only=True,  many=True)
-    commission = serializers.PrimaryKeyRelatedField(
-        queryset=Commission.objects.all())
+    commission = CommissionSerializer(read_only=True)
     selected_options = CommissionOptionSerializer(read_only=True,  many=True)
 
     class Meta:
